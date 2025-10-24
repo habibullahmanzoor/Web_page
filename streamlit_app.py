@@ -180,14 +180,23 @@ hr, .stDivider { opacity: .5; border-color: var(--border); }
 # =========================
 # DATA & HERO
 # =========================
+# =========================
+# DATA & HERO
+# =========================
 metrics = get_metrics()
 
 c1, c2, c3 = st.columns([0.26, 0.52, 0.22], gap="large")
 
 with c1:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.image(load_profile_photo_for_streamlit(), use_container_width=True)
+    try:
+        img_data = load_profile_photo_for_streamlit()
+        st.image(img_data, use_container_width=True)
+    except Exception as e:
+        st.warning("Profile image could not be loaded — skipping image display.")
+        # st.write(f"Debug: {e}")  # Uncomment to see the actual error if needed
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 with c2:
     st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -426,3 +435,4 @@ with tabs[9]:
         """,
         unsafe_allow_html=True,
     )
+
