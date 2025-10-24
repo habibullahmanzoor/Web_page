@@ -210,7 +210,7 @@ metrics = get_metrics()
 @st.cache_data(ttl=60*60*6, show_spinner=False)
 def get_latest_pubs(n=5):
     try:
-        return scholar_scraper.fetch_latest_publications(SCHOLAR_URL, limit=n)
+        return scholar_scraper.fetch_latest_publications(SCHOLAR_URL, count=n)
     except Exception:
         # graceful fallback to your static DATA list (most recent 5 by year)
         pubs = sorted(DATA.get("publications", []), key=lambda p: p.get("year", 0), reverse=True)
@@ -467,4 +467,5 @@ with tabs[9]:
           <p><strong>Phone:</strong> {DATA['phone']}</p>
         </div>
     """, unsafe_allow_html=True)
+
 
