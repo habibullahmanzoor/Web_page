@@ -70,13 +70,18 @@ def get_latest_pubs(count: int = 5) -> List[Dict[str, Optional[str]]]:
         ]
 
 
-def load_profile_photo() -> str:
-    """Return a verified local image path or a fallback URL (safe on Streamlit Cloud)."""
+def load_profile_photo_for_streamlit():
+    """
+    Return image data as bytes (best compatibility on Streamlit Cloud),
+    or a fallback URL if the local file is missing/unreadable.
+    """
     try:
         if PHOTO.exists() and PHOTO.is_file():
-            return str(PHOTO)  # Streamlit handles string paths well in Cloud
+            return PHOTO.read_bytes()  # << bytes are safest for st.image
     except Exception as e:
-        st.caption(f"[img-debug] Image load error: {e}")
+        # keep quiet in prod; uncomment to debug:
+        # st.caption(f"[img-debug] {e}")
+        pass
     return "https://via.placeholder.com/220?text=Profile"
 
 
@@ -181,7 +186,7 @@ c1, c2, c3 = st.columns([0.26, 0.52, 0.22], gap="large")
 
 with c1:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.image(load_profile_photo(), use_container_width=True)
+    st.image(load_profile_photo_for_streamlit(), use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 with c2:
