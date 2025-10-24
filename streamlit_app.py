@@ -11,7 +11,43 @@ import scholar_scraper
 
 # ---------- CONFIG ----------
 SCHOLAR_URL = "https://scholar.google.com/citations?user=tKDhmdAAAAAJ&hl=en"
-PHOTO = Path("static/habib.jpeg")
+from pathlib import Path
+import streamlit as st
+
+# Ensure correct absolute path regardless of working directory
+APP_DIR = Path(__file__).resolve().parent
+PHOTO = APP_DIR / "static" / "habib.jpeg"
+
+def load_profile_photo() -> str:
+    """Return a verified image path or fallback URL (safe for Streamlit Cloud)."""
+    try:
+        if PHOTO.exists() and PHOTO.is_file():
+            return str(PHOTO)
+        else:
+            st.caption(f"[img-debug] File not found: {PHOTO}")
+    except Exception as e:
+        st.caption(f"[img-debug] Image load error: {e}")
+    return "https://via.placeholder.com/220?text=Profile"
+
+# Inside your Streamlit layout:
+with c1:
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    img_src = load_profile_photo()
+
+    try:
+        st.image(img_src, use_container_width=True)
+    except Exception as e:
+        st.warning(f"Image failed to load. Using fallback. ({e})")
+        st.image("https://via.placeholder.com/220?text=Profile", use_container_width=True)
+
+    # Optional debug info (remove after success)
+    st.caption(f"Working dir: {Path.cwd()}")
+    st.caption(f"Resolved image path: {PHOTO} | Exists: {PHOTO.exists()} | Is file: {PHOTO.is_file()}")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+
 BIO_PATH = Path("static/biography.txt")
 
 st.set_page_config(
@@ -366,4 +402,5 @@ with tabs[9]:
         """,
         unsafe_allow_html=True,
     )
+
 
