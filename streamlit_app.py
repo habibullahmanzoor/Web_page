@@ -50,17 +50,17 @@ def get_latest_pubs(count: int = 5) -> List[Dict[str, Optional[str]]]:
             for p in pubs[:count]
         ]
 
-def load_profile_photo() -> Union[Image.Image, str]:
-    """Return a PIL Image if local file is valid; else return a fallback URL."""
+def load_profile_photo():
+    """Return a valid image path or URL that Streamlit can render safely."""
     try:
         if PHOTO.exists() and PHOTO.is_file():
-            img = Image.open(PHOTO)
-            img.verify()                 # integrity check (closes the file)
-            img = Image.open(PHOTO).convert("RGB")  # reopen after verify
-            return img
-    except Exception:
-        pass
+            # Return string path, not a PIL object (Streamlit Cloud sometimes breaks with Image objects)
+            return str(PHOTO)
+    except Exception as e:
+        st.warning(f"Image load failed: {e}")
+    # fallback URL
     return "https://via.placeholder.com/220?text=Profile"
+
 
 # ---------- THEME (Blue Academic) ----------
 st.markdown("""
@@ -158,8 +158,10 @@ c1, c2, c3 = st.columns([0.26, 0.52, 0.22], gap="large")
 
 with c1:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.image(load_profile_photo(), use_container_width=True)
+    img_path = load_profile_photo()
+    st.image(img_path, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 with c2:
     st.markdown('<div class="card">', unsafe_allow_html=True)
@@ -364,3 +366,4 @@ with tabs[9]:
         """,
         unsafe_allow_html=True,
     )
+
