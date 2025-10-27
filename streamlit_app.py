@@ -179,14 +179,14 @@ st.markdown("""
 # ---------- LOAD DATA ----------
 metrics = get_metrics()
 
-# ---------- HERO (2 columns: main + metrics, no image) ----------
-# ---------- HERO (simplified: no image, no empty space) ----------
+
+# ---------- HERO (simplified: no image) ----------
 col_main, col_metrics = st.columns([0.7, 0.3], gap="medium")
 
 with col_main:
     st.markdown(f"""
     <div class="card">
-      <h2 style='margin-bottom:0.3rem;'>{DATA['name']}</h2>
+      <h2 style="margin:0 0 .35rem 0;">{DATA['name']}</h2>
       <p><strong>{DATA['title']}</strong></p>
       <p>📍 {DATA['location']}</p>
       <p>{DATA['summary']}</p>
@@ -195,28 +195,32 @@ with col_main:
     """, unsafe_allow_html=True)
 
 with col_metrics:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown("**Publication metrics**")
-    st.markdown('<div class="metrics-wrap">', unsafe_allow_html=True)
-    st.markdown(
-        f"<div class='metric-chip'><p class='value'>{metrics.get('h_index','—')}</p><div class='label'>h-index</div></div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"<div class='metric-chip'><p class='value'>{metrics.get('i10_index','—')}</p><div class='label'>i10</div></div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"<div class='metric-chip'><p class='value'>{metrics.get('citations','—')}</p><div class='label'>Citations</div></div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+    metrics_html = f"""
+    <div class="card">
+      <h4 style="margin:0 0 .6rem 0;">Publication metrics</h4>
+      <div class="metrics-wrap">
+        <div class='metric-chip'>
+          <p class='value'>{metrics.get('h_index','—')}</p>
+          <div class='label'>h-index</div>
+        </div>
+        <div class='metric-chip'>
+          <p class='value'>{metrics.get('i10_index','—')}</p>
+          <div class='label'>i10</div>
+        </div>
+        <div class='metric-chip'>
+          <p class='value'>{metrics.get('citations','—')}</p>
+          <div class='label'>Citations</div>
+        </div>
+      </div>
+    </div>
+    """
+    st.markdown(metrics_html, unsafe_allow_html=True)
 
-    if st.button("🔄 Refresh Google Scholar metrics", type="secondary"):
+    # Put the refresh button AFTER the metrics card (not inside an empty card)
+    if st.button("🔄 Refresh Google Scholar metrics", key="refresh_metrics"):
         get_metrics.clear()
         st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ---------- TABS ----------
@@ -372,6 +376,7 @@ with tabs[9]:
         f"<p><strong>Phone:</strong> {DATA['phone']}</p></div>",
         unsafe_allow_html=True,
     )
+
 
 
 
