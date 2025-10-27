@@ -111,6 +111,70 @@ div[data-testid="stButton"] > button[kind="secondary"]:active {
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* --- Mobile responsiveness --- */
+
+/* Allow columns to wrap on small screens */
+@media (max-width: 900px) {
+  /* Stack Streamlit columns vertically */
+  [data-testid="column"] {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Comfortable page padding on phones */
+  .block-container {
+    max-width: 100% !important;
+    padding: 0.9rem 0.9rem 2rem 0.9rem !important;
+  }
+
+  /* Shrink card padding a bit */
+  .card { padding: 1rem !important; }
+
+  /* Metrics grid: auto-fit chips to screen width */
+  .metrics-wrap {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)) !important;
+    gap: .55rem !important;
+  }
+
+  /* Tabs: allow horizontal scroll and tighter spacing */
+  .stTabs [data-baseweb="tab-list"] {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    gap: .25rem !important;
+  }
+  .stTabs [data-baseweb="tab"] {
+    padding: .4rem .6rem !important;
+    font-size: 0.95rem !important;
+  }
+
+  /* Buttons: full-width CTA feel on mobile */
+  div[data-testid="stButton"] > button {
+    width: 100% !important;
+  }
+
+  /* Pills/tags: slightly smaller and tighter rows */
+  .pill {
+    padding: .34rem .6rem !important;
+    font-size: .88rem !important;
+  }
+
+  /* Paragraphs a hair smaller for narrow phones */
+  p { font-size: 0.98rem !important; line-height: 1.55 !important; }
+}
+
+/* Ultra-narrow devices */
+@media (max-width: 480px) {
+  h1 { font-size: 1.6rem !important; }
+  h2 { font-size: 1.25rem !important; }
+  h3 { font-size: 1.1rem !important; }
+}
+</style>
+""", unsafe_allow_html=True)
+
 
 # ---------- LOAD DATA ----------
 metrics = get_metrics()
@@ -310,4 +374,5 @@ with tabs[9]:
         f"<p><strong>Phone:</strong> {DATA['phone']}</p></div>",
         unsafe_allow_html=True,
     )
+
 
