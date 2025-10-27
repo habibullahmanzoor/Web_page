@@ -180,37 +180,34 @@ st.markdown("""
 metrics = get_metrics()
 
 # ---------- HERO (2 columns: main + metrics, no image) ----------
-left, right = st.columns([0.68, 0.32], gap="large")
+# ---------- HERO (simplified: no image, no empty space) ----------
+col_main, col_metrics = st.columns([0.7, 0.3], gap="medium")
 
-with left:
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    st.markdown(f"### {DATA['name']}")
-    st.markdown(f"**{DATA['title']}**")
-    st.markdown(f"📍 {DATA['location']}")
-    st.markdown(DATA["summary"])
-    st.markdown(
-        " ".join([f"<a class='btn' href='{v}' target='_blank'>{k}</a>" for k, v in DATA["links"].items()]),
-        unsafe_allow_html=True,
-    )
-    st.markdown('</div>', unsafe_allow_html=True)
+with col_main:
+    st.markdown(f"""
+    <div class="card">
+      <h2 style='margin-bottom:0.3rem;'>{DATA['name']}</h2>
+      <p><strong>{DATA['title']}</strong></p>
+      <p>📍 {DATA['location']}</p>
+      <p>{DATA['summary']}</p>
+      {" ".join([f"<a class='btn' href='{v}' target='_blank'>{k}</a>" for k, v in DATA['links'].items()])}
+    </div>
+    """, unsafe_allow_html=True)
 
-with right:
+with col_metrics:
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.markdown("**Publication metrics**")
     st.markdown('<div class="metrics-wrap">', unsafe_allow_html=True)
     st.markdown(
-        f"<div class='metric-chip'><p class='value'>{metrics.get('h_index','—')}</p>"
-        f"<div class='label'>h-index</div></div>",
+        f"<div class='metric-chip'><p class='value'>{metrics.get('h_index','—')}</p><div class='label'>h-index</div></div>",
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"<div class='metric-chip'><p class='value'>{metrics.get('i10_index','—')}</p>"
-        f"<div class='label'>i10</div></div>",
+        f"<div class='metric-chip'><p class='value'>{metrics.get('i10_index','—')}</p><div class='label'>i10</div></div>",
         unsafe_allow_html=True,
     )
     st.markdown(
-        f"<div class='metric-chip'><p class='value'>{metrics.get('citations','—')}</p>"
-        f"<div class='label'>Citations</div></div>",
+        f"<div class='metric-chip'><p class='value'>{metrics.get('citations','—')}</p><div class='label'>Citations</div></div>",
         unsafe_allow_html=True,
     )
     st.markdown('</div>', unsafe_allow_html=True)
@@ -220,6 +217,7 @@ with right:
         st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
+
 
 # ---------- TABS ----------
 tabs = st.tabs([
@@ -374,5 +372,6 @@ with tabs[9]:
         f"<p><strong>Phone:</strong> {DATA['phone']}</p></div>",
         unsafe_allow_html=True,
     )
+
 
 
