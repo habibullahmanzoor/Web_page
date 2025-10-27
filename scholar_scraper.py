@@ -156,3 +156,50 @@ def fetch_latest_publications(profile_url: str, count: int = 5) -> list[dict]:
         return pubs
     except Exception:
         return []
+
+# --- add in scholar_scraper.py ---
+from urllib.parse import urljoin
+
+def fetch_scholar_profile_photo(profile_url: str, timeout: int = 20, max_retries: int = 3) -> Optional[str]:
+    """
+    Return an absolute URL to the Scholar profile photo, or None if not found / blocked.
+    We try a few selectors to be robust to minor Scholar changes.
+    """
+    headers = {
+        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/124.0.0.0 Safari/537.36"),
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    last_exc = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.get(profile_url, headers=headers, timeout=timeout)
+            if resp.status_code != 200:
+                return None
+            html = resp.text
+            if "Our systems have detected unusual traffic" in html or "gs_captcha" in html:
+                return None
+
+            soup = BeautifulSoup(html, "html.parser")
+
+            # 1) Try common <img> with id or class
+            img = soup.find("img", id="gsc_prf_pup-img") or soup.find("img", class_="gsc_prf_pup")
+            if img and img.get("src"):
+                return urljoin("https://scholar.google.com", img["src"])
+
+            # 2) Sometimes photo is in a DIV with background-image style
+            div = soup.find(id="gsc_prf_pua") or soup.find("div", class_="gsc_prf_pua")
+            if div and div.get("style"):
+                # style="background-image:url('/citations/images/avatar_scholar_128.png')"
+                style = div["style"]
+                import re
+                m = re.search(r"background-image\s*:\s*url\(['\"]?([^'\"\)]+)", style)
+                if m:
+                    return urljoin("https://scholar.google.com", m.group(1))
+
+            return None
+        except Exception as e:
+            last_exc = e
+    return None
+
