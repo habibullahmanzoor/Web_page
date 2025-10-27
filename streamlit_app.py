@@ -86,6 +86,32 @@ hr,.stDivider{opacity:.5;border-color:var(--border)}
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+/* --- Stylish Refresh Button --- */
+div[data-testid="stButton"] > button[kind="secondary"] {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: all 0.2s ease-in-out;
+}
+div[data-testid="stButton"] > button[kind="secondary"]:hover {
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+}
+div[data-testid="stButton"] > button[kind="secondary"]:active {
+  transform: scale(0.97);
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 # ---------- LOAD DATA ----------
 metrics = get_metrics()
 
@@ -125,7 +151,7 @@ with right:
     )
     st.markdown('</div>', unsafe_allow_html=True)
 
-    if st.button("Refresh Google Scholar metrics"):  # renamed button
+    if st.button("🔄 Refresh Google Scholar metrics", type="secondary"):
         get_metrics.clear()
         st.rerun()
 
@@ -284,3 +310,4 @@ with tabs[9]:
         f"<p><strong>Phone:</strong> {DATA['phone']}</p></div>",
         unsafe_allow_html=True,
     )
+
