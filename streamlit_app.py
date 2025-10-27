@@ -29,6 +29,14 @@ st.set_page_config(
 # =========================
 # HELPERS / CACHED CALLS
 # =========================
+@st.cache_data(ttl=60*60*6, show_spinner=False)
+def get_scholar_photo_url() -> Optional[str]:
+    try:
+        return scholar_scraper.fetch_scholar_profile_photo(SCHOLAR_URL)
+    except Exception:
+        return None
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def load_bio() -> str:
     try:
@@ -83,6 +91,80 @@ def load_profile_photo_for_streamlit():
         # st.caption(f"[img-debug] {e}")
         pass
     return "https://via.placeholder.com/220?text=Profile"
+
+APP_DIR = Path(__file__).resolve().parent
+STATIC_DIR = APP_DIR / "static"
+PROFILE_IMG_PATH = STATIC_DIR / "habib.jpeg"
+
+@st.cache_data(ttl=60 * 60)
+def _read_image_bytes(p: Path) -> Optional[bytes]:
+    try:
+        return p.read_bytes()
+    except Exception:
+        return None
+
+def get_best_profile_image() -> dict:
+    """
+    Decide which image source to use:
+      1) Local bytes if static/habib.jpeg exists
+      2) Scholar photo URL if available
+      3) None (we'll render a placeholder)
+    Returns a dict like {"bytes": <bytes> } or {"url": <str>} or {}.
+    """
+    # 1) Local bytes
+    b = _read_image_bytes(PROFILE_IMG_PATH)
+    if b:
+        return {"bytes": b}
+
+    # 2) Scholar photo URL
+    url = get_scholar_photo_url()
+    if url:
+        return {"url": url}
+
+    # 3) Nothing
+    return {}
+
+def show_image_resilient(source: dict):
+    """
+    Render without crashing:
+     - If bytes -> st.image(bytes)
+     - If url   -> HTML <img> (bypasses st.image issues)
+     - Else     -> Nice placeholder box
+    """
+    if "bytes" in source:
+        try:
+            st.image(source["bytes"], use_container_width=True)
+            return
+        except Exception:
+            pass
+
+    if "url" in source:
+        # Use HTML to avoid st.image occasionally failing on remote URLs
+        st.markdown(
+            f"""
+            <div style="width:100%;">
+              <img src="{source['url']}" alt="Profile" style="
+                width:100%;height:auto;border-radius:14px;border:2px solid #cbdaf3;
+                box-shadow:0 4px 16px rgba(37,99,235,.15);object-fit:cover;">
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        return
+
+    # Fallback placeholder (no network/decoding needed)
+    st.markdown(
+        """
+        <div style="
+          width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+          border-radius:14px;border:2px dashed #cbdaf3;background:#e0edff;color:#1e40af;
+          font-weight:600;box-shadow:0 4px 16px rgba(37,99,235,.10);">
+          No photo available
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
 
 
 # =========================
@@ -189,13 +271,9 @@ c1, c2, c3 = st.columns([0.26, 0.52, 0.22], gap="large")
 
 with c1:
     st.markdown('<div class="card">', unsafe_allow_html=True)
-    try:
-        img_data = load_profile_photo_for_streamlit()
-        st.image(img_data, use_container_width=True)
-    except Exception as e:
-        st.warning("Profile image could not be loaded — skipping image display.")
-        # st.write(f"Debug: {e}")  # Uncomment to see the actual error if needed
-    st.markdown("</div>", unsafe_allow_html=True)
+    show_image_resilient(get_best_profile_image())
+    st.markdown('</div>', unsafe_allow_html=True)
+
 
 
 with c2:
@@ -435,5 +513,6 @@ with tabs[9]:
         """,
         unsafe_allow_html=True,
     )
+
 
 
