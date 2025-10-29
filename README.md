@@ -3,6 +3,8 @@
 This repository hosts the source code for my personal academic portfolio website, built using **Streamlit** and **Python**.  
 The website showcases my research, teaching, projects, publications, and professional achievements in an interactive, elegant format.
 
+Link :https://habibullahmanzoor.streamlit.app/
+If app is sleeping, wait for it to wake up.
 ---
 
 ## 🚀 Features
